@@ -1,0 +1,882 @@
+---
+title: "BULK HLA-G+ RNA-seq DATASET PREPARATION"
+author: "Matthew J Shannon"
+date: "2024-12-17"
+output: html_document
+---
+
+# Load in all dependencies
+
+```{r, include = FALSE}
+if (!requireNamespace ("BiocManager", quietly = TRUE))
+    install.packages  ("BiocManager")
+BiocManager::install  ("Rsamtools")
+BiocManager::install  ("GenomicAlignments")
+BiocManager::install  ("reshape2")
+BiocManager::install  ("limma")
+BiocManager::install  ("tidyverse")
+BiocManager::install  ("reshape")
+BiocManager::install  ("sva")
+BiocManager::install  ("DESeq2")
+BiocManager::install  ("biomaRt")
+BiocManager::install  ("readxl")
+BiocManager::install  ("apeglm")
+BiocManager::install  ("clusterProfiler")
+BiocManager::install  ("org.Hs.eg.db")
+BiocManager::install  ("ggpubr")
+BiocManager::install  ("ggpubr")
+BiocManager::install  ("pvclust")
+library               (Rsamtools)
+library               (GenomicAlignments)
+library               (GenomicRanges)
+library               (tidyverse)
+library               (knitr)
+library               (readxl)
+library               (edgeR)
+library               (reshape2)
+library               (limma)
+library               (pheatmap)
+library               (DESeq2)
+library               (ggplot2)
+library               (apeglm)
+library               (grid)
+library               (gridExtra)
+library               (sva)
+library               (png)
+library               (biomaRt)
+library               (RColorBrewer)
+library               (ggpubr)
+library               (pvclust)
+gc                    ()
+```
+
+# Full dataset
+
+## Read in the metadata file
+
+```{r}
+metaData <- read_excel ("/working_directory/path/FULL_metadata_file.xlsx")
+metaData
+```
+
+## Prepare the entire bulk RNA-seq dataset
+
+```{r}
+P122            <- read.table ("/working_directory/path/sample_P122.txt")
+P122$V2         <- abs        (P122$V2)
+colnames (P122) <- c("Gene", "P122")
+
+P132             <- read.table ("/working_directory/path/sample_P132.txt")
+colnames (P132)  <- c("Gene", "P132")
+
+P185             <- read.table ("/working_directory/path/sample_P185.txt")
+colnames (P185)  <- c("Gene", "P185")
+
+P156             <- read.table ("/working_directory/path/sample_P156.txt")
+colnames (P156)  <- c("Gene", "P156")
+
+P223             <- read.table ("/working_directory/path/sample_P223.txt")
+colnames (P223)  <- c("Gene", "P223")
+
+E12              <- read.table ("/working_directory/path/sample_E12.txt")
+colnames (E12)   <- c("Gene", "E12")
+
+P766             <- read.table ("/working_directory/path/sample_P766.txt")
+colnames (P766)  <- c("Gene", "P766")
+
+P219             <- read.table ("/working_directory/path/sample_P219.txt")
+colnames (P219)  <- c("Gene", "P219")
+
+P280             <- read.table ("/working_directory/path/sample_P280.txt")
+colnames (P280)  <- c("Gene", "P280")
+
+P5               <- read.table ("/working_directory/path/sample_P5.txt")
+colnames (P5)    <- c("Gene", "P5")
+
+P15              <- read.table ("/working_directory/path/sample_P15.txt")
+colnames (P15)   <- c("Gene", "P15")
+
+P250             <- read.table ("/working_directory/path/sample_P250.txt")
+colnames (P250)  <- c("Gene", "P250")
+
+P568            <- read.table ("/working_directory/path/sample_P568.txt")
+colnames (P568) <- c("Gene", "P568")
+
+P193            <- read.table ("/working_directory/path/sample_P193.txt")
+colnames (P193) <- c("Gene", "P193")
+
+P217            <- read.table ("/working_directory/path/sample_P217.txt")
+colnames (P217) <- c("Gene", "P217")
+
+P126            <- read.table ("/working_directory/path/sample_P126.txt")
+colnames (P126) <- c("Gene", "P126")
+
+P300            <- read.table ("/working_directory/path/sample_P300.txt")
+colnames (P300) <- c("Gene", "P300")
+
+P181            <- read.table ("/working_directory/path/sample_P181.txt")
+colnames (P181) <- c("Gene", "P181")
+
+P247            <- read.table ("/working_directory/path/sample_P247.txt")
+colnames (P247) <- c("Gene", "P247")
+
+P252            <- read.table ("/working_directory/path/sample_P252.txt")
+colnames (P252) <- c("Gene", "P252")
+
+P456            <- read.table ("/working_directory/path/sample_P456.txt")
+colnames (P456) <- c("Gene", "P456")
+
+P979            <- read.table ("/working_directory/path/sample_P979.txt")
+colnames (P979) <- c("Gene", "P979")
+
+P984            <- read.table ("/working_directory/path/sample_P984.txt")
+colnames (P984) <- c("Gene", "P984")
+
+P996            <- read.table ("/working_directory/path/sample_P996.txt")
+colnames (P996) <- c("Gene", "P996")
+
+P1003            <- read.table ("/working_directory/path/sample_P1003.txt")
+colnames (P1003) <- c("Gene", "P1003")
+
+P1004            <- read.table ("/working_directory/path/sample_P1004.txt")
+colnames (P1004) <- c("Gene", "P1004")
+
+P1012            <- read.table ("/working_directory/path/sample_P1012.txt")
+colnames (P1012) <- c("Gene", "P1012")
+
+P1015            <- read.table ("/working_directory/path/sample_P1015.txt")
+colnames (P1015) <- c("Gene", "P1015")
+
+P1019            <- read.table ("/working_directory/path/sample_P1019.txt")
+colnames (P1019) <- c("Gene", "P1019")
+
+P1024            <- read.table ("/working_directory/path/sample_P1024.txt")
+colnames (P1024) <- c("Gene", "P1024")
+
+P1025            <- read.table ("/working_directory/path/sample_P1025.txt")
+colnames (P1025) <- c("Gene", "P1025")
+
+P1029            <- read.table ("/working_directory/path/sample_P1029.txt")
+colnames (P1029) <- c("Gene", "P1029")
+
+P1037            <- read.table ("/working_directory/path/sample_P1037.txt")
+colnames (P1037) <- c("Gene", "P1037")
+
+P1041            <- read.table ("/working_directory/path/sample_P1041.txt")
+colnames (P1041) <- c("Gene", "P1041")
+
+P1047            <- read.table ("/working_directory/path/sample_P1047.txt")
+colnames (P1047) <- c("Gene", "P1047")
+
+P1051            <- read.table ("/working_directory/path/sample_P1051.txt")
+colnames (P1051) <- c("Gene", "P1051")
+```
+
+```{r}
+countData <- merge (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge (P122,
+                           P132,  by = "Gene", all = TRUE),
+                           P185,  by = "Gene", all = TRUE),
+                           P156,  by = "Gene", all = TRUE),
+                           P223,  by = "Gene", all = TRUE),
+                           E12,   by = "Gene", all = TRUE),
+                           P766,  by = "Gene", all = TRUE),
+                           P219,  by = "Gene", all = TRUE),
+                           P280,  by = "Gene", all = TRUE),
+                           P5,    by = "Gene", all = TRUE),
+                           P15,   by = "Gene", all = TRUE),
+                           P250,  by = "Gene", all = TRUE),
+                           P568,  by = "Gene", all = TRUE),
+                           P193,  by = "Gene", all = TRUE),
+                           P217,  by = "Gene", all = TRUE),
+                           P126,  by = "Gene", all = TRUE),
+                           P300,  by = "Gene", all = TRUE),
+                           P181,  by = "Gene", all = TRUE),
+                           P247,  by = "Gene", all = TRUE),
+                           P252,  by = "Gene", all = TRUE),
+                           P456,  by = "Gene", all = TRUE),
+                           P979,  by = "Gene", all = TRUE),
+                           P984,  by = "Gene", all = TRUE),
+                           P996,  by = "Gene", all = TRUE),
+                           P1003, by = "Gene", all = TRUE),
+                           P1004, by = "Gene", all = TRUE),
+                           P1012, by = "Gene", all = TRUE),
+                           P1015, by = "Gene", all = TRUE),
+                           P1019, by = "Gene", all = TRUE),
+                           P1024, by = "Gene", all = TRUE),
+                           P1025, by = "Gene", all = TRUE),
+                           P1029, by = "Gene", all = TRUE),
+                           P1037, by = "Gene", all = TRUE),
+                           P1041, by = "Gene", all = TRUE),
+                           P1047, by = "Gene", all = TRUE),
+                           P1051, by = "Gene", all = TRUE)
+
+countData <- countData %>% column_to_rownames ("Gene")
+countData
+```
+
+```{r}
+rm (P122)
+rm (P132)
+rm (P185)
+rm (P156)
+rm (P223)
+rm (E12)
+rm (P766)
+rm (P219)
+rm (P280)
+rm (P5)
+rm (P15)
+rm (P250)
+rm (P568)
+rm (P193)
+rm (P217)
+rm (P126)
+rm (P300)
+rm (P181)
+rm (P247)
+rm (P252)
+rm (P456)
+rm (P979)
+rm (P984)
+rm (P996)
+rm (P1003)
+rm (P1004)
+rm (P1012)
+rm (P1015)
+rm (P1019)
+rm (P1024)
+rm (P1025)
+rm (P1029)
+rm (P1037)
+rm (P1041)
+rm (P1047)
+rm (P1051)
+```
+
+## Quality Control
+
+```{r}
+logcountData    <- log2    (   countData  + 1)
+keep            <- rowSums (logcountData >= 1) > 3
+fltlogcountData <- logcountData [keep, ] %>% rownames_to_column ("Gene")
+
+rm (logcountData)
+rm (keep)
+```
+
+```{r, Figure S1A, bulk (full) RNA-seq filtered Log2 count data box plots}
+meltedfltlogcountData <- fltlogcountData %>% melt (id = "Gene") 
+meltedfltlogcountData %>% ggplot       (aes (x = variable, y = value)) +
+                          geom_boxplot () +
+                          theme        (axis.text.x = element_text (angle = 90, hjust = 1))
+
+rm (meltedfltlogcountData)
+```
+
+```{r}
+fltlogcountData <- remove_rownames (fltlogcountData)
+fltlogcountData <- fltlogcountData %>% column_to_rownames ("Gene")
+fltlogcountData
+```
+
+## Batch correction
+
+```{r}
+FULLdata <- as.matrix  (fltlogcountData)
+   batch =  as.numeric (metaData$Batch)
+
+FULLdata = ComBat (dat         = FULLdata,
+                   batch       = batch,
+                   mod         = NULL,
+                   par.prior   = TRUE,
+                   prior.plots = FALSE )
+```
+
+```{r}
+FULLdata <- as.data.frame (FULLdata)
+FULLdata
+```
+
+# Full dataset minus samples with a GA = 9.0
+
+# Read in the full dataset minus samples with a GA = 9.0 metadata file
+
+```{r}
+metaData <- read_excel ("/working_directory/path/EARLY_metadata_file.xlsx")
+metaData
+```
+
+# Prepare the full dataset minus samples with a GA = 9.0 bulk RNA-seq dataset
+
+```{r}
+P122            <- read.table ("/working_directory/path/sample_P122.txt")
+P122$V2         <- abs        (P122$V2)
+colnames (P122) <- c("Gene", "P122")
+
+P132             <- read.table ("/working_directory/path/sample_P132.txt")
+colnames (P132)  <- c("Gene", "P132")
+
+P185             <- read.table ("/working_directory/path/sample_P185.txt")
+colnames (P185)  <- c("Gene", "P185")
+
+P223             <- read.table ("/working_directory/path/sample_P223.txt")
+colnames (P223)  <- c("Gene", "P223")
+
+E12              <- read.table ("/working_directory/path/sample_E12.txt")
+colnames (E12)   <- c("Gene", "E12")
+
+P219             <- read.table ("/working_directory/path/sample_P219.txt")
+colnames (P219)  <- c("Gene", "P219")
+
+P280             <- read.table ("/working_directory/path/sample_P280.txt")
+colnames (P280)  <- c("Gene", "P280")
+
+P5               <- read.table ("/working_directory/path/sample_P5.txt")
+colnames (P5)    <- c("Gene", "P5")
+
+P250             <- read.table ("/working_directory/path/sample_P250.txt")
+colnames (P250)  <- c("Gene", "P250")
+
+P568            <- read.table ("/working_directory/path/sample_P568.txt")
+colnames (P568) <- c("Gene", "P568")
+
+P193            <- read.table ("/working_directory/path/sample_P193.txt")
+colnames (P193) <- c("Gene", "P193")
+
+P126            <- read.table ("/working_directory/path/sample_P126.txt")
+colnames (P126) <- c("Gene", "P126")
+
+P300            <- read.table ("/working_directory/path/sample_P300.txt")
+colnames (P300) <- c("Gene", "P300")
+
+P181            <- read.table ("/working_directory/path/sample_P181.txt")
+colnames (P181) <- c("Gene", "P181")
+
+P247            <- read.table ("/working_directory/path/sample_P247.txt")
+colnames (P247) <- c("Gene", "P247")
+
+P252            <- read.table ("/working_directory/path/sample_P252.txt")
+colnames (P252) <- c("Gene", "P252")
+
+P979            <- read.table ("/working_directory/path/sample_P979.txt")
+colnames (P979) <- c("Gene", "P979")
+
+P984            <- read.table ("/working_directory/path/sample_P984.txt")
+colnames (P984) <- c("Gene", "P984")
+
+P996            <- read.table ("/working_directory/path/sample_P996.txt")
+colnames (P996) <- c("Gene", "P996")
+
+P1004            <- read.table ("/working_directory/path/sample_P1004.txt")
+colnames (P1004) <- c("Gene", "P1004")
+
+P1012            <- read.table ("/working_directory/path/sample_P1012.txt")
+colnames (P1012) <- c("Gene", "P1012")
+
+P1015            <- read.table ("/working_directory/path/sample_P1015.txt")
+colnames (P1015) <- c("Gene", "P1015")
+
+P1019            <- read.table ("/working_directory/path/sample_P1019.txt")
+colnames (P1019) <- c("Gene", "P1019")
+
+P1024            <- read.table ("/working_directory/path/sample_P1024.txt")
+colnames (P1024) <- c("Gene", "P1024")
+
+P1025            <- read.table ("/working_directory/path/sample_P1025.txt")
+colnames (P1025) <- c("Gene", "P1025")
+
+P1029            <- read.table ("/working_directory/path/sample_P1029.txt")
+colnames (P1029) <- c("Gene", "P1029")
+
+P1037            <- read.table ("/working_directory/path/sample_P1037.txt")
+colnames (P1037) <- c("Gene", "P1037")
+
+P1041            <- read.table ("/working_directory/path/sample_P1041.txt")
+colnames (P1041) <- c("Gene", "P1041")
+
+P1047            <- read.table ("/working_directory/path/sample_P1047.txt")
+colnames (P1047) <- c("Gene", "P1047")
+
+P1051            <- read.table ("/working_directory/path/sample_P1051.txt")
+colnames (P1051) <- c("Gene", "P1051")
+```
+
+```{r}
+countData <- merge (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge (P122,
+                           P132,  by = "Gene", all = TRUE),
+                           P185,  by = "Gene", all = TRUE),
+                           P223,  by = "Gene", all = TRUE),
+                           E12,   by = "Gene", all = TRUE),
+                           P219,  by = "Gene", all = TRUE),
+                           P280,  by = "Gene", all = TRUE),
+                           P5,    by = "Gene", all = TRUE),
+                           P250,  by = "Gene", all = TRUE),
+                           P568,  by = "Gene", all = TRUE),
+                           P193,  by = "Gene", all = TRUE),
+                           P126,  by = "Gene", all = TRUE),
+                           P300,  by = "Gene", all = TRUE),
+                           P181,  by = "Gene", all = TRUE),
+                           P247,  by = "Gene", all = TRUE),
+                           P252,  by = "Gene", all = TRUE),
+                           P979,  by = "Gene", all = TRUE),
+                           P984,  by = "Gene", all = TRUE),
+                           P996,  by = "Gene", all = TRUE),
+                           P1004, by = "Gene", all = TRUE),
+                           P1012, by = "Gene", all = TRUE),
+                           P1015, by = "Gene", all = TRUE),
+                           P1019, by = "Gene", all = TRUE),
+                           P1024, by = "Gene", all = TRUE),
+                           P1025, by = "Gene", all = TRUE),
+                           P1029, by = "Gene", all = TRUE),
+                           P1037, by = "Gene", all = TRUE),
+                           P1041, by = "Gene", all = TRUE),
+                           P1047, by = "Gene", all = TRUE),
+                           P1051, by = "Gene", all = TRUE)
+
+countData <- countData %>% column_to_rownames ("Gene")
+countData
+```
+
+```{r}
+rm (P122)
+rm (P132)
+rm (P185)
+rm (P223)
+rm (E12)
+rm (P219)
+rm (P280)
+rm (P5)
+rm (P250)
+rm (P568)
+rm (P193)
+rm (P126)
+rm (P300)
+rm (P181)
+rm (P247)
+rm (P252)
+rm (P979)
+rm (P984)
+rm (P996)
+rm (P1004)
+rm (P1012)
+rm (P1015)
+rm (P1019)
+rm (P1024)
+rm (P1025)
+rm (P1029)
+rm (P1037)
+rm (P1041)
+rm (P1047)
+rm (P1051)
+```
+
+## Quality Control
+
+```{r}
+logcountData    <- log2    (   countData  + 1)
+keep            <- rowSums (logcountData >= 1) > 3
+fltlogcountData <- logcountData [keep, ] %>% rownames_to_column ("Gene")
+fltlogcountData <- remove_rownames (fltlogcountData)
+fltlogcountData <- fltlogcountData %>% column_to_rownames ("Gene")
+fltlogcountData
+
+rm (logcountData)
+rm (keep)
+```
+
+## Batch correction
+
+```{r}
+SMALLdata <- as.matrix  (fltlogcountData)
+    batch =  as.numeric (metaData$Batch)
+
+SMALLdata = ComBat (dat         = SMALLdata,
+                    batch       = batch,
+                    mod         = NULL,
+                    par.prior   = TRUE,
+                    prior.plots = FALSE )
+
+rm (fltlogcountData)
+```
+
+```{r}
+SMALLdata <- as.data.frame (SMALLdata)
+SMALLdata
+```
+
+# Early first trimester samples
+
+# Read in the early first trimester (GA <10.0) metadata file
+
+```{r}
+metaData <- read_excel ("/working_directory/path/EARLY_metadata_file.xlsx")
+metaData
+```
+
+## Prepare the early first trimester (GA <10.0) bulk RNA-seq dataset
+
+```{r}
+P185             <- read.table ("/working_directory/path/sample_P185.txt")
+colnames (P185)  <- c("Gene", "P185")
+
+P156             <- read.table ("/working_directory/path/sample_P156.txt")
+colnames (P156)  <- c("Gene", "P156")
+
+P223             <- read.table ("/working_directory/path/sample_P223.txt")
+colnames (P223)  <- c("Gene", "P223")
+
+P766             <- read.table ("/working_directory/path/sample_P766.txt")
+colnames (P766)  <- c("Gene", "P766")
+
+P280             <- read.table ("/working_directory/path/sample_P280.txt")
+colnames (P280)  <- c("Gene", "P280")
+
+P5               <- read.table ("/working_directory/path/sample_P5.txt")
+colnames (P5)    <- c("Gene", "P5")
+
+P15              <- read.table ("/working_directory/path/sample_P15.txt")
+colnames (P15)   <- c("Gene", "P15")
+
+P250             <- read.table ("/working_directory/path/sample_P250.txt")
+colnames (P250)  <- c("Gene", "P250")
+
+P568            <- read.table ("/working_directory/path/sample_P568.txt")
+colnames (P568) <- c("Gene", "P568")
+
+P193            <- read.table ("/working_directory/path/sample_P193.txt")
+colnames (P193) <- c("Gene", "P193")
+
+P217            <- read.table ("/working_directory/path/sample_P217.txt")
+colnames (P217) <- c("Gene", "P217")
+
+P181            <- read.table ("/working_directory/path/sample_P181.txt")
+colnames (P181) <- c("Gene", "P181")
+
+P247            <- read.table ("/working_directory/path/sample_P247.txt")
+colnames (P247) <- c("Gene", "P247")
+
+P252            <- read.table ("/working_directory/path/sample_P252.txt")
+colnames (P252) <- c("Gene", "P252")
+
+P456            <- read.table ("/working_directory/path/sample_P456.txt")
+colnames (P456) <- c("Gene", "P456")
+
+P979            <- read.table ("/working_directory/path/sample_P979.txt")
+colnames (P979) <- c("Gene", "P979")
+
+P984            <- read.table ("/working_directory/path/sample_P984.txt")
+colnames (P984) <- c("Gene", "P984")
+
+P996            <- read.table ("/working_directory/path/sample_P996.txt")
+colnames (P996) <- c("Gene", "P996")
+
+P1003            <- read.table ("/working_directory/path/sample_P1003.txt")
+colnames (P1003) <- c("Gene", "P1003")
+
+P1004            <- read.table ("/working_directory/path/sample_P1004.txt")
+colnames (P1004) <- c("Gene", "P1004")
+
+P1024            <- read.table ("/working_directory/path/sample_P1024.txt")
+colnames (P1024) <- c("Gene", "P1024")
+
+P1047            <- read.table ("/working_directory/path/sample_P1047.txt")
+colnames (P1047) <- c("Gene", "P1047")
+
+P1051            <- read.table ("/working_directory/path/sample_P1051.txt")
+colnames (P1051) <- c("Gene", "P1051")
+```
+
+```{r}
+countData <- merge (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge (P185,
+                           P156,  by = "Gene", all = TRUE),
+                           P223,  by = "Gene", all = TRUE),
+                           P766,  by = "Gene", all = TRUE),
+                           P280,  by = "Gene", all = TRUE),
+                           P5,    by = "Gene", all = TRUE),
+                           P15,   by = "Gene", all = TRUE),
+                           P250,  by = "Gene", all = TRUE),
+                           P568,  by = "Gene", all = TRUE),
+                           P193,  by = "Gene", all = TRUE),
+                           P217,  by = "Gene", all = TRUE),
+                           P181,  by = "Gene", all = TRUE),
+                           P247,  by = "Gene", all = TRUE),
+                           P252,  by = "Gene", all = TRUE),
+                           P456,  by = "Gene", all = TRUE),
+                           P979,  by = "Gene", all = TRUE),
+                           P984,  by = "Gene", all = TRUE),
+                           P996,  by = "Gene", all = TRUE),
+                           P1003, by = "Gene", all = TRUE),
+                           P1004, by = "Gene", all = TRUE),
+                           P1024, by = "Gene", all = TRUE),
+                           P1047, by = "Gene", all = TRUE),
+                           P1051, by = "Gene", all = TRUE)
+
+countData <- countData %>% column_to_rownames ("Gene")
+countData
+```
+
+```{r}
+rm (P185)
+rm (P156)
+rm (P223)
+rm (P766)
+rm (P280)
+rm (P5)
+rm (P15)
+rm (P250)
+rm (P568)
+rm (P193)
+rm (P217)
+rm (P181)
+rm (P247)
+rm (P252)
+rm (P456)
+rm (P979)
+rm (P984)
+rm (P996)
+rm (P1003)
+rm (P1004)
+rm (P1024)
+rm (P1047)
+rm (P1051)
+```
+
+## Quality Control
+
+```{r}
+logcountData    <- log2    (   countData  + 1)
+keep            <- rowSums (logcountData >= 1) > 3
+fltlogcountData <- logcountData [keep, ] %>% rownames_to_column ("Gene")
+fltlogcountData <- remove_rownames (fltlogcountData)
+fltlogcountData <- fltlogcountData %>% column_to_rownames ("Gene")
+fltlogcountData
+
+rm (logcountData)
+rm (keep)
+```
+
+## Batch correction
+
+```{r}
+EARLYdata <- as.matrix  (fltlogcountData)
+    batch =  as.numeric (metaData$Batch)
+
+EARLYdata = ComBat (dat         = EARLYdata,
+                    batch       = batch,
+                    mod         = NULL,
+                    par.prior   = TRUE,
+                    prior.plots = FALSE )
+
+rm (fltlogcountData)
+```
+
+```{r}
+EARLYdata <- as.data.frame (EARLYdata)
+EARLYdata
+```
+
+# Late first trimester samples
+
+## Read in the late first trimester (GA >=10.0) metadata file minus sample E12
+
+```{r}
+metaData <- read_excel ("/working_directory/path/LATE_metadata_file.xlsx")
+metaData
+```
+
+## Prepare the late first trimester (GA >=10.0) bulk RNA-seq dataset without sample E12
+
+```{r}
+P122            <- read.table ("/working_directory/path/sample_P122.txt")
+P122$V2         <- abs        (P122$V2)
+colnames (P122) <- c("Gene", "P122")
+
+P132             <- read.table ("/working_directory/path/sample_P132.txt")
+colnames (P132)  <- c("Gene", "P132")
+
+P219             <- read.table ("/working_directory/path/sample_P219.txt")
+colnames (P219)  <- c("Gene", "P219")
+
+P126            <- read.table ("/working_directory/path/sample_P126.txt")
+colnames (P126) <- c("Gene", "P126")
+
+P300            <- read.table ("/working_directory/path/sample_P300.txt")
+colnames (P300) <- c("Gene", "P300")
+
+P1012            <- read.table ("/working_directory/path/sample_P1012.txt")
+colnames (P1012) <- c("Gene", "P1012")
+
+P1015            <- read.table ("/working_directory/path/sample_P1015.txt")
+colnames (P1015) <- c("Gene", "P1015")
+
+P1019            <- read.table ("/working_directory/path/sample_P1019.txt")
+colnames (P1019) <- c("Gene", "P1019")
+
+P1025            <- read.table ("/working_directory/path/sample_P1025.txt")
+colnames (P1025) <- c("Gene", "P1025")
+
+P1029            <- read.table ("/working_directory/path/sample_P1029.txt")
+colnames (P1029) <- c("Gene", "P1029")
+
+P1037            <- read.table ("/working_directory/path/sample_P1037.txt")
+colnames (P1037) <- c("Gene", "P1037")
+
+P1041            <- read.table ("/working_directory/path/sample_P1041.txt")
+colnames (P1041) <- c("Gene", "P1041")
+```
+
+```{r}
+countData <- merge (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge
+                   (merge (P122,
+                           P132,  by = "Gene", all = TRUE),
+                           P219,  by = "Gene", all = TRUE),
+                           P126,  by = "Gene", all = TRUE),
+                           P300,  by = "Gene", all = TRUE),
+                           P1012, by = "Gene", all = TRUE),
+                           P1015, by = "Gene", all = TRUE),
+                           P1019, by = "Gene", all = TRUE),
+                           P1025, by = "Gene", all = TRUE),
+                           P1029, by = "Gene", all = TRUE),
+                           P1037, by = "Gene", all = TRUE),
+                           P1041, by = "Gene", all = TRUE)
+
+countData <- countData %>% column_to_rownames ("Gene")
+countData
+```
+
+```{r}
+rm (P122)
+rm (P132)
+rm (P219)
+rm (P126)
+rm (P300)
+rm (P1012)
+rm (P1015)
+rm (P1019)
+rm (P1025)
+rm (P1029)
+rm (P1037)
+rm (P1041)
+```
+
+## Quality Control
+
+```{r}
+logcountData    <- log2    (   countData  + 1)
+keep            <- rowSums (logcountData >= 1) > 3
+fltlogcountData <- logcountData [keep, ] %>% rownames_to_column ("Gene")
+fltlogcountData <- remove_rownames (fltlogcountData)
+fltlogcountData <- fltlogcountData %>% column_to_rownames ("Gene")
+fltlogcountData
+
+rm (logcountData)
+rm (keep)
+```
+
+## Batch correction
+
+```{r}
+LATEdata <- as.matrix  (fltlogcountData)
+   batch =  as.numeric (metaData$Batch)
+
+LATEdata = ComBat (dat         = LATEdata,
+                   batch       = batch,
+                   mod         = NULL,
+                   par.prior   = TRUE,
+                   prior.plots = FALSE )
+
+rm (fltlogcountData)
+```
+
+```{r}
+LATEdata <- as.data.frame (LATEdata)
+LATEdata
+```
